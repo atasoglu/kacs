@@ -1,5 +1,9 @@
 # kacs
 
+<p align="center">
+  <img src="assets/banner.png" alt="kacs banner">
+</p>
+
 [![CI](https://github.com/atasoglu/kacs/actions/workflows/pre-commit.yml/badge.svg)](https://github.com/atasoglu/kacs/actions/workflows/pre-commit.yml)
 [![PyPI version](https://img.shields.io/pypi/v/kacs)](https://pypi.org/project/kacs/)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
