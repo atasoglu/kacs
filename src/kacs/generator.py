@@ -1,7 +1,7 @@
 """LLM-powered changelog generation for kacs."""
 
 import os
-from typing import List, Dict
+from typing import List, Dict, Optional
 from ask2api import generate_api_response, Config
 
 
@@ -19,7 +19,7 @@ CHANGELOG_SCHEMA = {
 }
 
 
-def analyze_commits(commits: List[str], language: str = "en") -> Dict:
+def analyze_commits(commits: List[Dict[str, str]], language: str = "en") -> Dict:
     """Use ask2api to categorize commits into changelog sections."""
     if not commits:
         return {
@@ -31,10 +31,13 @@ def analyze_commits(commits: List[str], language: str = "en") -> Dict:
             "security": [],
         }
 
+    # Extract messages from commit dicts
+    messages = [c["message"] if isinstance(c, dict) else c for c in commits]
+
     lang_instruction = f" Respond in {language}." if language != "en" else ""
     prompt = (
         f"Analyze these git commits and categorize them into changelog sections.{lang_instruction}\n\n"
-        + "\n".join(commits)
+        + "\n".join(messages)
     )
 
     try:
@@ -46,9 +49,37 @@ def analyze_commits(commits: List[str], language: str = "en") -> Dict:
 
 
 def generate_changelog(
-    analysis: Dict, version: str, release_date: str, language: str = "en"
+    analysis: Dict,
+    version: str,
+    release_date: str,
+    template: Optional[str] = None,
+    custom_template: Optional[str] = None,
+    include_links: bool = False,
+    repo_url: Optional[str] = None,
+    from_tag: str = "",
+    commits: Optional[List[Dict[str, str]]] = None,
 ) -> str:
-    """Format analysis into Keep a Changelog format."""
+    """Format analysis into changelog format.
+
+    If template is provided, uses template system. Otherwise falls back to
+    Keep a Changelog format for backward compatibility.
+    """
+    if template or custom_template:
+        from .renderer import render_changelog
+
+        return render_changelog(
+            analysis,
+            version,
+            release_date,
+            template or "keepachangelog",
+            custom_template,
+            include_links,
+            repo_url,
+            from_tag,
+            commits,
+        )
+
+    # Backward compatible: Keep a Changelog format
     clean_version = version.lstrip("v")
     changelog = f"## [{clean_version}] - {release_date}\n\n"
 

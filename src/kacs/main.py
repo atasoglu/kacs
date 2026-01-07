@@ -4,7 +4,7 @@ import argparse
 import os
 import sys
 from datetime import date
-from .git import extract_commits
+from .git import extract_commits, get_repository_url
 from .generator import analyze_commits, generate_changelog
 
 
@@ -30,10 +30,33 @@ def main():
     parser.add_argument(
         "--append", help="Append to existing changelog file instead of overwriting"
     )
+    parser.add_argument(
+        "--template",
+        choices=["keepachangelog", "github", "gitlab", "simple"],
+        help="Changelog template format",
+    )
+    parser.add_argument("--custom-template", help="Path to custom Jinja2 template file")
+    parser.add_argument(
+        "--include-links", action="store_true", help="Include commit links in changelog"
+    )
+    parser.add_argument(
+        "--repo-url",
+        help="Repository URL for commit links (auto-detected if not provided)",
+    )
 
     args = parser.parse_args()
 
     try:
+        # Auto-detect repository URL if needed
+        repo_url = args.repo_url
+        if args.include_links and not repo_url:
+            repo_url = get_repository_url()
+            if not repo_url:
+                print(
+                    "Warning: Could not detect repository URL. Commit links disabled.",
+                    file=sys.stderr,
+                )
+                args.include_links = False
         # Extract commits between tags
         commits = extract_commits(args.from_tag, args.to_tag)
 
@@ -65,7 +88,15 @@ def main():
 
         # Generate changelog
         changelog = generate_changelog(
-            analysis, args.to_tag, release_date, args.language
+            analysis,
+            args.to_tag,
+            release_date,
+            args.template,
+            args.custom_template,
+            args.include_links,
+            repo_url,
+            args.from_tag,
+            commits,
         )
 
         # Output to file or stdout

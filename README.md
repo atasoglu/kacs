@@ -12,7 +12,7 @@ A minimal Python CLI tool that generates changelogs from git commit messages usi
 ## Features
 
 - 🚀 **Minimal dependencies** - Only requires `ask2api` + Python stdlib
-- 📝 **Keep a Changelog format** - Generates valid [keepachangelog.com](https://keepachangelog.com/) format
+- 📝 **Multiple formats** - Keep a Changelog, GitHub, GitLab, or custom templates
 - 🤖 **LLM-powered analysis** - Automatically categorizes commits into Added, Changed, Fixed, etc.
 - ⚡ **CI/CD ready** - Fast execution suitable for automated workflows
 - 🎯 **Git tag based** - Extract commits between any two git tags
@@ -48,8 +48,32 @@ kacs --from-tag v1.0.0 --to-tag v1.1.0 --date 2017-07-17
 kacs --from-tag v1.0.0 --to-tag v1.1.0 --output CHANGELOG.md
 ```
 
+### Templates
+
+```bash
+# Use GitHub format
+kacs --from-tag v1.0.0 --to-tag v1.1.0 --template github
+
+# Use GitLab format
+kacs --from-tag v1.0.0 --to-tag v1.1.0 --template gitlab
+
+# Use custom template
+kacs --from-tag v1.0.0 --to-tag v1.1.0 --custom-template ./my-template.j2
+```
+
+### Commit Links
+
+```bash
+# Include commit links (auto-detects repository URL)
+kacs --from-tag v1.0.0 --to-tag v1.1.0 --include-links
+
+# With explicit repository URL
+kacs --from-tag v1.0.0 --to-tag v1.1.0 --include-links --repo-url https://github.com/user/repo
+```
+
 ### Example Output
 
+**Keep a Changelog format (default):**
 ```markdown
 ## [1.1.0] - 2024-01-15
 
@@ -66,6 +90,20 @@ kacs --from-tag v1.0.0 --to-tag v1.1.0 --output CHANGELOG.md
 - Resolved issue with concurrent requests
 ```
 
+**GitHub format:**
+```markdown
+## What's Changed in 1.1.0
+
+### ✨ New Features
+* New user authentication system
+* Support for multiple database backends
+
+### 🐛 Bug Fixes
+* Fixed memory leak in background tasks
+
+**Full Changelog**: https://github.com/user/repo/compare/v1.0.0...v1.1.0
+```
+
 ### CI/CD Integration
 
 ```yaml
@@ -77,6 +115,10 @@ kacs --from-tag v1.0.0 --to-tag v1.1.0 --output CHANGELOG.md
   env:
     ASK2API_API_KEY: ${{ secrets.ASK2API_API_KEY }}
 ```
+
+## Documentation
+
+- [Template System](docs/TEMPLATES.md) - Learn about built-in templates and creating custom ones
 
 ## License
 
