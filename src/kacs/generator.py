@@ -43,10 +43,10 @@ def analyze_commits(commits: List[str]) -> Dict:
         raise RuntimeError(f"Failed to analyze commits with LLM: {e}")
 
 
-def generate_changelog(analysis: Dict, version: str) -> str:
+def generate_changelog(analysis: Dict, version: str, release_date: str) -> str:
     """Format analysis into Keep a Changelog format."""
     clean_version = version.lstrip("v")
-    changelog = f"## [{clean_version}]\n\n"
+    changelog = f"## [{clean_version}] - {release_date}\n\n"
 
     sections = [
         ("Added", analysis.get("added", [])),

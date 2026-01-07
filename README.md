@@ -41,6 +41,9 @@ export OPENAI_API_KEY="your-openai-key"
 # Generate changelog between two tags
 kacs --from-tag v1.0.0 --to-tag v1.1.0
 
+# With custom date
+kacs --from-tag v1.0.0 --to-tag v1.1.0 --date 2017-07-17
+
 # Save to file
 kacs --from-tag v1.0.0 --to-tag v1.1.0 --output CHANGELOG.md
 ```

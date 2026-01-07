@@ -2,6 +2,7 @@
 
 import argparse
 import sys
+from datetime import date
 from .git import extract_commits
 from .generator import analyze_commits, generate_changelog
 
@@ -19,6 +20,9 @@ def main():
         "--to-tag", required=True, help="Ending git tag for changelog generation"
     )
     parser.add_argument("--output", help="Output file path (default: stdout)")
+    parser.add_argument(
+        "--date", help="Release date (YYYY-MM-DD format, default: today)"
+    )
 
     args = parser.parse_args()
 
@@ -36,8 +40,11 @@ def main():
         # Analyze commits with LLM
         analysis = analyze_commits(commits)
 
+        # Get release date
+        release_date = args.date if args.date else date.today().isoformat()
+
         # Generate changelog
-        changelog = generate_changelog(analysis, args.to_tag)
+        changelog = generate_changelog(analysis, args.to_tag, release_date)
 
         # Output to file or stdout
         if args.output:
