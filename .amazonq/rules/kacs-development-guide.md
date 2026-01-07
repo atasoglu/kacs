@@ -60,7 +60,7 @@ from ask2api import generate_api_response, Config
 def analyze_commits(commits: list[str]) -> dict:
     # Prepare commit messages as prompt
     prompt = f"Analyze these git commits and categorize them:\n\n" + "\n".join(commits)
-    
+
     # Define changelog schema
     schema = {
         "type": "object",
@@ -74,11 +74,11 @@ def analyze_commits(commits: list[str]) -> dict:
         },
         "required": ["added", "changed", "fixed"]
     }
-    
+
     # Get structured response from LLM
     config = Config.from_env()  # Uses ASK2API_API_KEY or OPENAI_API_KEY
     result = generate_api_response(prompt, schema, config)
-    
+
     return result
 ```
 
