@@ -1,6 +1,7 @@
 """kacs - Keep a changelog, stupid!"""
 
 import argparse
+import os
 import sys
 from datetime import date
 from .git import extract_commits
@@ -26,6 +27,9 @@ def main():
     parser.add_argument(
         "--language", default="en", help="Language for changelog (default: en)"
     )
+    parser.add_argument(
+        "--append", help="Append to existing changelog file instead of overwriting"
+    )
 
     args = parser.parse_args()
 
@@ -40,6 +44,19 @@ def main():
             )
             sys.exit(1)
 
+        # Check version exists before LLM analysis
+        if args.append or args.output:
+            filepath = args.output or args.append
+            if filepath and os.path.exists(filepath):
+                clean_version = args.to_tag.lstrip("v")
+                with open(filepath, "r", encoding="utf-8") as f:
+                    if f"## [{clean_version}]" in f.read():
+                        print(
+                            f"Error: Version {clean_version} already exists in changelog",
+                            file=sys.stderr,
+                        )
+                        sys.exit(1)
+
         # Analyze commits with LLM
         analysis = analyze_commits(commits, args.language)
 
@@ -53,9 +70,20 @@ def main():
 
         # Output to file or stdout
         if args.output:
-            with open(args.output, "w", encoding="utf-8") as f:
-                f.write(changelog)
-            print(f"Changelog written to {args.output}")
+            if args.append:
+                from .generator import append_to_changelog
+
+                append_to_changelog(args.output, changelog)
+                print(f"Changelog appended to {args.output}")
+            else:
+                with open(args.output, "w", encoding="utf-8") as f:
+                    f.write(changelog)
+                print(f"Changelog written to {args.output}")
+        elif args.append:
+            from .generator import append_to_changelog
+
+            append_to_changelog(args.append, changelog)
+            print(f"Changelog appended to {args.append}")
         else:
             print(changelog, end="")
 

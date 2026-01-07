@@ -1,5 +1,6 @@
 """LLM-powered changelog generation for kacs."""
 
+import os
 from typing import List, Dict
 from ask2api import generate_api_response, Config
 
@@ -68,3 +69,35 @@ def generate_changelog(
             changelog += "\n"
 
     return changelog.rstrip() + "\n"
+
+
+def append_to_changelog(filepath: str, new_entry: str) -> None:
+    """Append new changelog entry to existing file."""
+    if not os.path.exists(filepath):
+        with open(filepath, "w", encoding="utf-8") as f:
+            f.write(new_entry)
+        return
+
+    with open(filepath, "r", encoding="utf-8") as f:
+        existing_content = f.read().strip()
+
+    lines = existing_content.split("\n")
+    insert_idx = len(lines)
+
+    # Find insertion point after [Unreleased] or before first version entry
+    for i, line in enumerate(lines):
+        if line.startswith("## [Unreleased]"):
+            # Skip [Unreleased] section and find next ## [ or end
+            for j in range(i + 1, len(lines)):
+                if lines[j].startswith("## [") and "Unreleased" not in lines[j]:
+                    insert_idx = j
+                    break
+            break
+        elif line.startswith("## ["):
+            insert_idx = i
+            break
+
+    new_lines = lines[:insert_idx] + [new_entry.rstrip()] + [""] + lines[insert_idx:]
+
+    with open(filepath, "w", encoding="utf-8") as f:
+        f.write("\n".join(new_lines))
