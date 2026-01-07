@@ -9,7 +9,7 @@ from .generator import analyze_commits, generate_changelog
 def main():
     """Main CLI entry point."""
     parser = argparse.ArgumentParser(
-        description="Generate changelogs from git commit messages using LLM analysis",
+        description="Generate changelogs from git commit messages using LLM.",
         prog="kacs",
     )
     parser.add_argument(
