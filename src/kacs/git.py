@@ -45,12 +45,14 @@ def extract_commits(from_tag: str, to_tag: str) -> List[str]:
 
     try:
         result = subprocess.run(
-            ["git", "log", f"{from_tag}..{to_tag}", "--pretty=format:%s"],
+            ["git", "log", f"{from_tag}..{to_tag}", "--pretty=format:%B%n---"],
             check=True,
             capture_output=True,
             text=True,
         )
-        commits = [line.strip() for line in result.stdout.split("\n") if line.strip()]
+        commits = [
+            commit.strip() for commit in result.stdout.split("---") if commit.strip()
+        ]
         return commits
     except subprocess.CalledProcessError as e:
         raise RuntimeError(f"Failed to extract commits: {e}")
