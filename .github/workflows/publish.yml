@@ -28,6 +28,20 @@ jobs:
     - name: Build package
       run: python -m build
 
+    - name: Generate changelog
+      env:
+        ASK2API_API_KEY: ${{ secrets.ASK2API_API_KEY }}
+        TAG_NAME: ${{ github.ref_name }}
+      run: |
+        pip install -e .
+        # Get previous tag for changelog generation
+        PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+        if [ -n "$PREV_TAG" ]; then
+          kacs --from-tag "$PREV_TAG" --to-tag "$TAG_NAME" --output CHANGELOG.md
+        else
+          echo "No previous tag found, skipping changelog generation"
+        fi
+
     - name: Extract changelog
       id: changelog
       env:
