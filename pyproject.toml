@@ -1,6 +1,6 @@
 [project]
 name = "kacs"
-version = "0.2.0"
+version = "0.3.0"
 description = "Keep a changelog, stupid! Generate changelogs from git commits using LLM."
 readme = "README.md"
 license = {text = "MIT"}
