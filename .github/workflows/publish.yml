@@ -14,6 +14,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
     - name: Set up Python
       uses: actions/setup-python@v5
@@ -35,9 +37,14 @@ jobs:
       run: |
         pip install -e .
         # Get previous tag for changelog generation
-        PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || git rev-list --max-parents=0 HEAD)
-        kacs --from-tag "$PREV_TAG" --to-tag "$TAG_NAME" --output CHANGELOG.md
-
+        TAGS=$(git tag --sort=-creatordate)
+        PREV_TAG=$(echo "$TAGS" | sed -n '2p')
+        if [ -z "$PREV_TAG" ]; then
+          echo "No previous tag found. Creating initial changelog."
+          printf "## [%s]\n\nInitial release.\n" "$TAG_NAME" > CHANGELOG.md
+        else
+          kacs --from-tag "$PREV_TAG" --to-tag "$TAG_NAME" --output CHANGELOG.md
+        fi
     - name: Extract changelog
       id: changelog
       env:
