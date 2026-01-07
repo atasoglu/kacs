@@ -45,7 +45,8 @@ def analyze_commits(commits: List[str]) -> Dict:
 
 def generate_changelog(analysis: Dict, version: str) -> str:
     """Format analysis into Keep a Changelog format."""
-    changelog = f"## [{version}]\n\n"
+    clean_version = version.lstrip("v")
+    changelog = f"## [{clean_version}]\n\n"
 
     sections = [
         ("Added", analysis.get("added", [])),

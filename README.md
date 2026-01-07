@@ -48,7 +48,7 @@ kacs --from-tag v1.0.0 --to-tag v1.1.0 --output CHANGELOG.md
 ### Example Output
 
 ```markdown
-## [v1.1.0] - 2024-01-15
+## [1.1.0] - 2024-01-15
 
 ### Added
 - New user authentication system
