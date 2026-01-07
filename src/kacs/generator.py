@@ -18,7 +18,7 @@ CHANGELOG_SCHEMA = {
 }
 
 
-def analyze_commits(commits: List[str]) -> Dict:
+def analyze_commits(commits: List[str], language: str = "en") -> Dict:
     """Use ask2api to categorize commits into changelog sections."""
     if not commits:
         return {
@@ -30,8 +30,9 @@ def analyze_commits(commits: List[str]) -> Dict:
             "security": [],
         }
 
+    lang_instruction = f" Respond in {language}." if language != "en" else ""
     prompt = (
-        "Analyze these git commits and categorize them into changelog sections:\n\n"
+        f"Analyze these git commits and categorize them into changelog sections.{lang_instruction}\n\n"
         + "\n".join(commits)
     )
 
@@ -43,7 +44,9 @@ def analyze_commits(commits: List[str]) -> Dict:
         raise RuntimeError(f"Failed to analyze commits with LLM: {e}")
 
 
-def generate_changelog(analysis: Dict, version: str, release_date: str) -> str:
+def generate_changelog(
+    analysis: Dict, version: str, release_date: str, language: str = "en"
+) -> str:
     """Format analysis into Keep a Changelog format."""
     clean_version = version.lstrip("v")
     changelog = f"## [{clean_version}] - {release_date}\n\n"

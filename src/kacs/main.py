@@ -23,6 +23,9 @@ def main():
     parser.add_argument(
         "--date", help="Release date (YYYY-MM-DD format, default: today)"
     )
+    parser.add_argument(
+        "--language", default="en", help="Language for changelog (default: en)"
+    )
 
     args = parser.parse_args()
 
@@ -38,13 +41,15 @@ def main():
             sys.exit(1)
 
         # Analyze commits with LLM
-        analysis = analyze_commits(commits)
+        analysis = analyze_commits(commits, args.language)
 
         # Get release date
         release_date = args.date if args.date else date.today().isoformat()
 
         # Generate changelog
-        changelog = generate_changelog(analysis, args.to_tag, release_date)
+        changelog = generate_changelog(
+            analysis, args.to_tag, release_date, args.language
+        )
 
         # Output to file or stdout
         if args.output:
