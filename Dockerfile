@@ -10,7 +10,7 @@ RUN apt-get update && \
 WORKDIR /app
 
 # Copy and install package
-COPY pyproject.toml ./
+COPY pyproject.toml README.md ./
 COPY src/ ./src/
 
 RUN pip install --no-cache-dir .
@@ -18,4 +18,5 @@ RUN pip install --no-cache-dir .
 # Set git safe directory for CI/CD (allow all directories)
 RUN git config --global --add safe.directory '*'
 
-CMD ["kacs"]
+ENTRYPOINT ["kacs"]
+CMD ["--help"]
