@@ -7,15 +7,15 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Set working directory
-WORKDIR /workspace
+WORKDIR /app
 
 # Copy and install package
-COPY pyproject.toml README.md ./
+COPY pyproject.toml ./
 COPY src/ ./src/
 
-RUN pip install --no-cache-dir -e .
+RUN pip install --no-cache-dir .
 
-# Set git safe directory for CI/CD
-RUN git config --global --add safe.directory /workspace
+# Set git safe directory for CI/CD (allow all directories)
+RUN git config --global --add safe.directory '*'
 
 CMD ["kacs"]
