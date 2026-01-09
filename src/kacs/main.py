@@ -6,6 +6,7 @@ import sys
 from datetime import date
 from .git import extract_commits, get_repository_url
 from .generator import analyze_commits, generate_changelog
+from .validator import validate_changelog
 
 
 def main():
@@ -14,14 +15,19 @@ def main():
         description="Generate changelogs from git commit messages using LLM.",
         prog="kacs",
     )
-    parser.add_argument(
+    # Create mutually exclusive group for validate vs generate
+    mode_group = parser.add_mutually_exclusive_group(required=True)
+    mode_group.add_argument(
+        "--validate",
+        metavar="FILE",
+        help="Validate changelog file format",
+    )
+    mode_group.add_argument(
         "--from-tag",
-        required=True,
         help="Starting git reference (tag, branch, or commit) for changelog generation",
     )
     parser.add_argument(
         "--to-tag",
-        required=True,
         help="Ending git reference (tag, branch, HEAD, or commit) for changelog generation",
     )
     parser.add_argument("--output", help="Output file path (default: stdout)")
@@ -54,8 +60,24 @@ def main():
 
     args = parser.parse_args()
 
+    # Handle validation mode
+    if args.validate:
+        is_valid, issues = validate_changelog(args.validate)
+        if is_valid:
+            print(f"✓ {args.validate} is valid")
+            sys.exit(0)
+        else:
+            print(f"✗ {args.validate} has issues:\n")
+            for issue in issues:
+                print(f"  - {issue}")
+            sys.exit(1)
+
+    # Generation mode - require to-tag
+    if not args.to_tag:
+        parser.error("--to-tag is required for changelog generation")
+
+    # Auto-detect repository URL if needed
     try:
-        # Auto-detect repository URL if needed
         repo_url = args.repo_url
         if args.include_links and not repo_url:
             repo_url = get_repository_url()
