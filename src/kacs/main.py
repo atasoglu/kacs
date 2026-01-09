@@ -15,10 +15,14 @@ def main():
         prog="kacs",
     )
     parser.add_argument(
-        "--from-tag", required=True, help="Starting git tag for changelog generation"
+        "--from-tag",
+        required=True,
+        help="Starting git reference (tag, branch, or commit) for changelog generation",
     )
     parser.add_argument(
-        "--to-tag", required=True, help="Ending git tag for changelog generation"
+        "--to-tag",
+        required=True,
+        help="Ending git reference (tag, branch, HEAD, or commit) for changelog generation",
     )
     parser.add_argument("--output", help="Output file path (default: stdout)")
     parser.add_argument(

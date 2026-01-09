@@ -18,11 +18,11 @@ def is_git_repository() -> bool:
         return False
 
 
-def tag_exists(tag: str) -> bool:
-    """Check if a git tag exists."""
+def ref_exists(ref: str) -> bool:
+    """Check if a git reference (tag, branch, or HEAD) exists."""
     try:
         subprocess.run(
-            ["git", "rev-parse", f"refs/tags/{tag}"],
+            ["git", "rev-parse", "--verify", ref],
             check=True,
             capture_output=True,
             text=True,
@@ -54,20 +54,20 @@ def get_repository_url() -> Optional[str]:
         return None
 
 
-def extract_commits(from_tag: str, to_tag: str) -> List[Dict[str, str]]:
-    """Extract commit messages and hashes between git tags."""
+def extract_commits(from_ref: str, to_ref: str) -> List[Dict[str, str]]:
+    """Extract commit messages and hashes between git references (tags, branches, or HEAD)."""
     if not is_git_repository():
         raise RuntimeError("Not in a git repository")
 
-    if not tag_exists(from_tag):
-        raise ValueError(f"Tag '{from_tag}' does not exist")
+    if not ref_exists(from_ref):
+        raise ValueError(f"Reference '{from_ref}' does not exist")
 
-    if not tag_exists(to_tag):
-        raise ValueError(f"Tag '{to_tag}' does not exist")
+    if not ref_exists(to_ref):
+        raise ValueError(f"Reference '{to_ref}' does not exist")
 
     try:
         result = subprocess.run(
-            ["git", "log", f"{from_tag}..{to_tag}", "--pretty=format:%H|||%B|||---"],
+            ["git", "log", f"{from_ref}..{to_ref}", "--pretty=format:%H|||%B|||---"],
             check=True,
             capture_output=True,
             text=True,
