@@ -19,7 +19,11 @@ CHANGELOG_SCHEMA = {
 }
 
 
-def analyze_commits(commits: List[Dict[str, str]], language: str = "en") -> Dict:
+def analyze_commits(
+    commits: List[Dict[str, str]],
+    language: str = "en",
+    instructions: Optional[str] = None,
+) -> Dict:
     """Use ask2api to categorize commits into changelog sections."""
     if not commits:
         return {
@@ -35,8 +39,9 @@ def analyze_commits(commits: List[Dict[str, str]], language: str = "en") -> Dict
     messages = [c["message"] if isinstance(c, dict) else c for c in commits]
 
     lang_instruction = f" Respond in {language}." if language != "en" else ""
+    extra_instruction = f" {instructions}" if instructions else ""
     prompt = (
-        f"Analyze these git commits and categorize them into changelog sections.{lang_instruction}\n\n"
+        f"Analyze these git commits and categorize them into changelog sections.{lang_instruction}{extra_instruction}\n\n"
         + "\n".join(messages)
     )
 

@@ -47,6 +47,10 @@ def main():
         "--repo-url",
         help="Repository URL for commit links (auto-detected if not provided)",
     )
+    parser.add_argument(
+        "--instructions",
+        help="Extra instructions to pass to LLM for changelog generation",
+    )
 
     args = parser.parse_args()
 
@@ -85,7 +89,7 @@ def main():
                         sys.exit(1)
 
         # Analyze commits with LLM
-        analysis = analyze_commits(commits, args.language)
+        analysis = analyze_commits(commits, args.language, args.instructions)
 
         # Get release date
         release_date = args.date if args.date else date.today().isoformat()
